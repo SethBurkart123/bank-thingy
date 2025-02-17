@@ -1,0 +1,37 @@
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                  String    @id @default(cuid())
+  email               String    @unique
+  password            String
+  name                String?
+  balance             Float     @default(500)
+  twoFactorSecret     String?
+  twoFactorEnabled    Boolean   @default(false)
+  twoFactorVerified   Boolean   @default(false)
+  transactions        Transaction[] @relation("UserTransactions")
+  sentTransactions    Transaction[] @relation("SentTransactions")
+  receivedTransactions Transaction[] @relation("ReceivedTransactions")
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  amount      Float
+  type        String    // "SEND" or "RECEIVE"
+  userId      String
+  user        User      @relation("UserTransactions", fields: [userId], references: [id])
+  senderId    String
+  sender      User     @relation("SentTransactions", fields: [senderId], references: [id])
+  recipientId String
+  recipient   User     @relation("ReceivedTransactions", fields: [recipientId], references: [id])
+  createdAt   DateTime  @default(now())
+}
