@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { db } from "@/lib/db"
-import { authOptions } from "../auth/[...nextauth]/route"
-import { notifyUser } from "../updates/route"
+import { authOptions } from "../auth/auth.config"
+import { notifyUser } from "../updates/utils"
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 

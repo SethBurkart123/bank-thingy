@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
-import { authOptions } from "@/app/api/auth/[...nextauth]/route"
+import { authOptions } from "@/app/api/auth/auth.config"
 import { db } from "@/lib/db"
 import { authenticator } from "otplib"
 import QRCode from "qrcode"
