@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { User, Settings, LogOut } from "lucide-react"
+import { User, LogOut, Settings } from "lucide-react"
 
 export function NavBar() {
   const { data: session } = useSession()
@@ -56,13 +56,6 @@ export function NavBar() {
                   <span>Two-Factor Auth</span>
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link href="/settings" className="cursor-pointer flex items-center">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Settings</span>
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
               <DropdownMenuItem 
                 onClick={() => signOut({ callbackUrl: '/login' })}
                 className="cursor-pointer text-red-600 focus:text-red-600 focus:bg-red-50"

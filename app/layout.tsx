@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Head from "next/head";
 import localFont from "next/font/local";
 import "./globals.css";
 import { Toaster } from "@/components/ui/toaster";
@@ -30,6 +31,9 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
+      <Head>
+        <meta http-equiv="X-Frame-Options" content="DENY" />
+      </Head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
