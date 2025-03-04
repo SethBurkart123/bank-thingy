@@ -1,118 +1,117 @@
-'use client'
+"use client";
 
-import { useEffect, useState } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { useToast } from "@/hooks/use-toast"
-import { motion } from "framer-motion"
-import { ArrowUpRight, ArrowDownRight, DollarSign, Clock } from "lucide-react"
-import { AnimatedBalance } from "@/components/animated-balance"
+import { useEffect, useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
+import { ArrowUpRight, ArrowDownRight, DollarSign, Clock } from "lucide-react";
+import { AnimatedBalance } from "@/components/animated-balance";
 
 interface Transaction {
-  id: string
-  amount: number
-  type: string
-  createdAt: string
+  id: string;
+  amount: number;
+  type: string;
+  createdAt: string;
   sender: {
-    email: string
-  }
+    email: string;
+  };
   recipient: {
-    email: string
-  }
+    email: string;
+  };
 }
 
 export default function DashboardPage() {
-  const { toast } = useToast()
-  const [isLoading, setIsLoading] = useState(false)
-  const [balance, setBalance] = useState(0)
-  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
+  const [balance, setBalance] = useState(0);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
 
   async function fetchData() {
     try {
       const [userResponse, transactionsResponse] = await Promise.all([
-        fetch('/api/user'),
-        fetch('/api/transactions')
-      ])
+        fetch("/api/user"),
+        fetch("/api/transactions"),
+      ]);
 
       if (userResponse.ok) {
-        const userData = await userResponse.json()
-        setBalance(userData.balance)
+        const userData = await userResponse.json();
+        setBalance(userData.balance);
       }
 
       if (transactionsResponse.ok) {
-        const transactionsData = await transactionsResponse.json()
-        setTransactions(transactionsData)
+        const transactionsData = await transactionsResponse.json();
+        setTransactions(transactionsData);
       }
     } catch (error) {
-      console.error('Failed to fetch data:', error)
+      console.error("Failed to fetch data:", error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to fetch data"
-      })
+        description: "Failed to fetch data",
+      });
     }
   }
 
   useEffect(() => {
-    fetchData()
+    fetchData();
 
-    const eventSource = new EventSource('/api/updates')
-    eventSource.onmessage = (event) => {
-      if (event.data === 'update') {
-        fetchData()
-      }
-    }
-    eventSource.onerror = () => {
-      eventSource.close()
-    }
-    return () => {
-      eventSource.close()
-    }
-  }, [])
+    // fetchData on an interval
+    const interval = setInterval(fetchData, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
 
   async function handleSubmit(event: React.FormEvent) {
-    event.preventDefault()
-    setIsLoading(true)
+    event.preventDefault();
+    setIsLoading(true);
 
-    const formData = new FormData(event.currentTarget as HTMLFormElement)
-    const recipientEmail = formData.get('email') as string
-    const amount = parseFloat(formData.get('amount') as string)
+    const formData = new FormData(event.currentTarget as HTMLFormElement);
+    const recipientEmail = formData.get("email") as string;
+    const amount = parseFloat(formData.get("amount") as string);
 
     try {
-      const response = await fetch('/api/transactions', {
-        method: 'POST',
+      const response = await fetch("/api/transactions", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           recipientEmail,
           amount,
         }),
-      })
+      });
 
       if (!response.ok) {
-        const data = await response.text()
-        throw new Error(data || 'Failed to send money')
+        const data = await response.text();
+        throw new Error(data || "Failed to send money");
       }
 
       toast({
         title: "Success",
         description: "Money sent successfully",
-      })
+      });
 
       await fetchData();
-      
-      (event.target as HTMLFormElement).reset()
+
+      (event.target as HTMLFormElement).reset();
     } catch (error) {
       toast({
         variant: "destructive",
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to send money",
-      })
+        description:
+          error instanceof Error ? error.message : "Failed to send money",
+      });
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -123,21 +122,21 @@ export default function DashboardPage() {
       y: 0,
       transition: {
         duration: 0.6,
-        staggerChildren: 0.1
-      }
-    }
-  }
+        staggerChildren: 0.1,
+      },
+    },
+  };
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: {
       opacity: 1,
-      y: 0
-    }
-  }
+      y: 0,
+    },
+  };
 
   return (
-    <motion.div 
+    <motion.div
       className="flex-1 space-y-6 p-8 pt-6"
       initial="hidden"
       animate="visible"
@@ -195,7 +194,7 @@ export default function DashboardPage() {
                     className="border-violet-100 focus:border-violet-500"
                   />
                 </div>
-                <Button 
+                <Button
                   disabled={isLoading}
                   className="w-full bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
                 >
@@ -213,7 +212,9 @@ export default function DashboardPage() {
                 <Clock className="h-5 w-5 text-violet-500" />
                 <span>Recent Transactions</span>
               </CardTitle>
-              <CardDescription>Your recent transaction history.</CardDescription>
+              <CardDescription>
+                Your recent transaction history.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -225,7 +226,7 @@ export default function DashboardPage() {
                     animate={{ opacity: 1, x: 0 }}
                   >
                     <div className="h-9 w-9 rounded-full flex items-center justify-center bg-violet-100">
-                      {transaction.type === 'SEND' ? (
+                      {transaction.type === "SEND" ? (
                         <ArrowUpRight className="h-5 w-5 text-violet-500" />
                       ) : (
                         <ArrowDownRight className="h-5 w-5 text-green-500" />
@@ -233,19 +234,25 @@ export default function DashboardPage() {
                     </div>
                     <div className="ml-4 flex-1 space-y-1">
                       <p className="text-sm font-medium">
-                        {transaction.type === 'SEND' 
-                          ? `Sent to ${transaction.recipient.email}` 
+                        {transaction.type === "SEND"
+                          ? `Sent to ${transaction.recipient.email}`
                           : `Received from ${transaction.sender.email}`}
                       </p>
                       <p className="text-xs text-muted-foreground">
-                        {new Date(transaction.createdAt).toLocaleDateString()} at{' '}
+                        {new Date(transaction.createdAt).toLocaleDateString()}{" "}
+                        at{" "}
                         {new Date(transaction.createdAt).toLocaleTimeString()}
                       </p>
                     </div>
-                    <div className={`font-medium ${
-                      transaction.type === 'SEND' ? 'text-red-500' : 'text-green-500'
-                    }`}>
-                      {transaction.type === 'SEND' ? '-' : '+'}${Math.abs(transaction.amount).toFixed(2)}
+                    <div
+                      className={`font-medium ${
+                        transaction.type === "SEND"
+                          ? "text-red-500"
+                          : "text-green-500"
+                      }`}
+                    >
+                      {transaction.type === "SEND" ? "-" : "+"}$
+                      {Math.abs(transaction.amount).toFixed(2)}
                     </div>
                   </motion.div>
                 ))}
@@ -260,5 +267,5 @@ export default function DashboardPage() {
         </motion.div>
       </div>
     </motion.div>
-  )
+  );
 }
