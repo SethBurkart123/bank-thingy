@@ -5,7 +5,7 @@ export function middleware(req: NextRequest) {
 
   // Prevent embedding in iframe
   res.headers.set('X-Frame-Options', 'DENY');
-  res.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
+  res.headers.set('Content-Security-Policy', "frame-ancestors 'none'; script-src 'self'; object-src 'none';");
 
   return res;
 }
