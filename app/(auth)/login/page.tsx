@@ -24,7 +24,6 @@ export default function LoginPage() {
 
     try {
       if (!show2FA) {
-        // First step: Validate email/password
         const result = await signIn("credentials", {
           email,
           password,
@@ -53,7 +52,6 @@ export default function LoginPage() {
         router.push("/dashboard")
         router.refresh()
       } else {
-        // Complete sign in with 2FA code
         const finalSignIn = await signIn("credentials", {
           email,
           password,

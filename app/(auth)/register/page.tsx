@@ -43,7 +43,6 @@ export default function RegisterPage() {
         throw new Error(await response.text());
       }
 
-      // Auto sign in after registration
       const result = await signIn("credentials", {
         email,
         password,

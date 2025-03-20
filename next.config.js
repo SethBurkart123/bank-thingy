@@ -9,6 +9,23 @@ const nextConfig = {
       },
     ],
   },
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "Content-Security-Policy",
+            value: "default-src 'self'; script-src 'self' 'unsafe-inline'; object-src 'none'; frame-ancestors 'none';"
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY" // Prevents embedding in any iframe
+          }
+        ]
+      }
+    ];
+  }
 }
 
 module.exports = nextConfig
